@@ -35,7 +35,7 @@
 
 - name: Ensure that OVHcloud credentials file is available
   ansible.builtin.template:
-    src: "{{ playbook_dir }}/credentials.ini.j2"
+    src: "credentials.ini.j2"
     dest: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.config/certbot-dns-ovh/credentials.ini"
     owner: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
     group: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
@@ -53,7 +53,7 @@
 
 - name: Ensure that ~/.local/bin/certbot-dns-ovh-renew.sh e is available
   ansible.builtin.template:
-    src: "{{ playbook_dir }}/certbot-dns-ovh-renew.sh.j2"
+    src: "certbot-dns-ovh-renew.sh.j2"
     dest: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.local/bin/certbot-dns-ovh-renew.sh"
     owner: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
     group: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
