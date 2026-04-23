@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Run certbot with dns-ovh plugin to get a domain wildcard certificate
+#
+podman run -v ~/.local/share/letsencrypt:/etc/letsencrypt:rw,Z -v ~/.config/certbot-dns-ovh:/dns-ovh:ro,Z docker.io/certbot/dns-ovh certonly --agree-tos --non-interactive --dns-ovh --dns-ovh-credentials /dns-ovh/credentials.ini -d {{ puppeteers_ovhcloud_certbot_dns_domain }}

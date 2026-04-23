@@ -1,0 +1,5 @@
+- name: Run certbot-dns-ovh-renew.sh
+  ansible.builtin.command:
+    cmd: "/home/{{ puppeteers_ovhcloud_dns_ovh_local_user }}/.local/bin/certbot-dns-ovh-renew.sh"
+  become: true
+  become_user: "{{ puppeteers_ovhcloud_dns_ovh_local_user }}"

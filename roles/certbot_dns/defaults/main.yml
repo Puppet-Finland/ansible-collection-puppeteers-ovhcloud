@@ -1,0 +1,6 @@
+puppeteers_ovhcloud_certbot_dns_podman_package: podman
+puppeteers_ovhcloud_certbot_dns_cron_package: cronie
+puppeteers_ovhcloud_certbot_dns_cron_hour: "7"
+puppeteers_ovhcloud_certbot_dns_cron_minute: "17"
+puppeteers_ovhcloud_certbot_dns_cron_weekday: "*"
+puppeteers_ovhcloud_certbot_dns_endpoint: ovh-eu

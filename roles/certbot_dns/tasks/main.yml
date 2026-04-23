@@ -1,0 +1,70 @@
+- name: Validate parameters
+  ansible.builtin.assert:
+    that:
+      - puppeteers_ovhcloud_certbot_dns_local_user is string
+      - puppeteers_ovhcloud_certbot_dns_podman_package is string
+      - puppeteers_ovhcloud_certbot_dns_cron_package is string
+      - puppeteers_ovhcloud_certbot_dns_local_user is string
+      - puppeteers_ovhcloud_certbot_dns_endpoint is match ('^(ovh-eu|ovh-ca)$')
+      - puppeteers_ovhcloud_certbot_dns_application_key is defined
+      - puppeteers_ovhcloud_certbot_dns_application_secret is defined
+      - puppeteers_ovhcloud_certbot_dns_consumer_key is defined
+
+- name: Ensure that prerequisites (podman, cron) are installed
+  ansible.builtin.package:
+    name:
+      - podman
+      - "{{ puppeteers_ovhcloud_certbot_dns_cron_package }}"
+    state: present
+
+- name: Ensure that ~/.local/share/letsencrypt directory is available
+  ansible.builtin.file:
+    path: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.local/share/letsencrypt"
+    state: directory
+    owner: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    group: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    mode: "0700"
+
+- name: Ensure that ~/.config/dns-ovh directory is available
+  ansible.builtin.file:
+    path: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.config/certbot-dns-ovh"
+    state: directory
+    owner: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    group: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    mode: "0700"
+
+- name: Ensure that OVHcloud credentials file is available
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/credentials.ini.j2"
+    dest: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.config/certbot-dns-ovh/credentials.ini"
+    owner: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    group: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    mode: "0600"
+  notify: Run certbot-dns-ovh-renew.sh
+
+- name: Ensure that ~/.local/bin directory is available
+  ansible.builtin.file:
+    path: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.local/bin"
+    state: directory
+    recurse: true
+    owner: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    group: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    mode: "0700"
+
+- name: Ensure that ~/.local/bin/certbot-dns-ovh-renew.sh e is available
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/certbot-dns-ovh-renew.sh.j2"
+    dest: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.local/bin/certbot-dns-ovh-renew.sh"
+    owner: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    group: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    mode: "0700"
+  notify: Run certbot-dns-ovh-renew.sh
+
+- name: Add certbot dns-ovh renewal cronjob
+  ansible.builtin.cron:
+    name: Renew domain wildcard certificate
+    user: "{{ puppeteers_ovhcloud_certbot_dns_local_user }}"
+    job: "/home/{{ puppeteers_ovhcloud_certbot_dns_local_user }}/.local/bin/certbot-dns-ovh-renew.sh"
+    hour: "{{ puppeteers_ovhcloud_certbot_dns_cron_hour }}"
+    minute: "{{ puppeteers_ovhcloud_certbot_dns_cron_minute }}"
+    weekday: "{{ puppeteers_ovhcloud_certbot_dns_cron_weekday }}"
